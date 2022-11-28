@@ -85,8 +85,22 @@ public class RoundDatabaseDaoTest extends TestCase {
     }
 
     @Test
-    public void testGetAllOfGame() {
-         //implement
+    public void testGetAllOfGame()
+    {
+        GameService gameService = new GameService();
+        Game game = gameService.newGame();
+        gameDao.add(game);
+
+        Round round = new Round();
+        
+        round.setGuess("1111");
+        round.setGameId(game.getGameId());
+
+        roundDao.add(round);
+        
+        List<Round> rounds = roundDao.getAllOfGame(game.getGameId());
+
+        assertEquals(rounds.size(), 1);
     }
 
 }

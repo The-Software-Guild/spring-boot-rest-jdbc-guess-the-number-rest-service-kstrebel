@@ -6,6 +6,8 @@ import guessNumberGame.Service.GameService;
 import guessNumberGame.TestApplicationConfiguration;
 import guessNumberGame.models.Game;
 import guessNumberGame.models.Round;
+
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +55,19 @@ public class GameDatabaseDaoTest extends TestCase {
 
     @Test
     public void testGetAll() {
-        //implement
+        GameService gameService = new GameService();
+
+        Game game = gameService.newGame();
+        Game game2 = gameService.newGame();
+
+        gameDao.add(game);
+        gameDao.add(game2);
+
+        List<Game> games = gameDao.getAll();
+
+        assertEquals(games.size(), 2);
+        assertTrue(games.contains(game));
+        assertTrue(games.contains(game2));
     }
 
 
@@ -70,6 +84,20 @@ public class GameDatabaseDaoTest extends TestCase {
 
     @Test
     public void testDeleteById() {
-         //implement
+        GameService gameService = new GameService();
+
+        Game game = gameService.newGame();
+        Game game2 = gameService.newGame();
+
+        gameDao.add(game);
+        gameDao.add(game2);
+
+        gameDao.deleteById(game.getGameId());
+
+        List<Game> games = gameDao.getAll();
+
+        assertEquals(games.size(), 1);
+        assertTrue(games.contains(game2));
+        assertEquals(games.contains(game), false);;
     }
 }

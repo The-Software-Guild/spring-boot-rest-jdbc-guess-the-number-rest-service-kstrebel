@@ -14,25 +14,29 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class GameDatabaseDao implements GameDao {
-     private final JdbcTemplate jdbcTemplate;
+public class GameDatabaseDao implements GameDao
+{
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public GameDatabaseDao(JdbcTemplate jdbcTemplate) {
+    public GameDatabaseDao(JdbcTemplate jdbcTemplate)
+    {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public Game add(Game game) {
+    public Game add(Game game)
+    {
 
         final String sql = "INSERT INTO Game(answer, isFinished) VALUES(?,?);";
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update((Connection conn) -> {
+        jdbcTemplate.update((Connection conn) ->
+        {
 
             PreparedStatement statement = conn.prepareStatement(
-                sql,
-                Statement.RETURN_GENERATED_KEYS);
+                    sql,
+                    Statement.RETURN_GENERATED_KEYS);
 
             statement.setString(1, game.getAnswer());
             statement.setBoolean(2, game.getIsFinished());
@@ -46,28 +50,47 @@ public class GameDatabaseDao implements GameDao {
     }
 
     @Override
-    public List<Game> getAll() {
-       //implement }
+    public List<Game> getAll()
+    {
+        final String sql = "SELECT game_id, answer, isFinished FROM Game;";
 
-
-    @Override
-    public Game findById(int game_id) {
-       //implement }
-
-    @Override
-    public boolean update(Game game) {
-
-         //implement
+        return jdbcTemplate.query(sql, new GameMapper());
     }
 
     @Override
-    public boolean deleteById(int game_id) {
-       //implement }
+    public Game findById(int game_id)
+    {
+        final String sql = "SELECT game_id, answer, isFinished FROM Game WHERE game_id = ?;";
 
-    private static final class GameMapper implements RowMapper<Game> {
+        return jdbcTemplate.queryForObject(sql, new GameMapper(), game_id);
+    }
+
+    @Override
+    public boolean update(Game game)
+    {
+        final String sql = "UPDATE Game SET answer = ?, isFinished = ? WHERE game_id = ?;";
+
+        return jdbcTemplate.update(sql, game.getAnswer(), game.getIsFinished(), game.getGameId()) > 0;
+    }
+
+    @Override
+    public boolean deleteById(int game_id)
+    {
+        final String sql = "DELETE FROM Game WHERE game_id = ?;";
+
+        return jdbcTemplate.update(sql, game_id) > 0;
+
+        //final String sql = "SELECT COUNT(*) FROM Game WHERE game_id = ?;";
+//
+        //return jdbcTemplate.queryForObject(sql, new GameMapper(), game_id) > 0;
+    }
+
+    private static final class GameMapper implements RowMapper<Game>
+    {
 
         @Override
-        public Game mapRow(ResultSet rs, int index) throws SQLException {
+        public Game mapRow(ResultSet rs, int index) throws SQLException
+        {
             Game game = new Game();
             game.setGameId(rs.getInt("game_id"));
             game.setAnswer(rs.getString("answer"));
